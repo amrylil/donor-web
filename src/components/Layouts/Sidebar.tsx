@@ -5,8 +5,11 @@ import {
   Locate,
   LocationEditIcon,
   BlindsIcon,
+  LogOut,
 } from "lucide-react";
 import SidebarLink from "./SidebarLink";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -14,6 +17,17 @@ type SidebarProps = {
 };
 
 const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/auth/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <aside
       className={` flex  flex-col overflow-y-auto bg-red-50 px-5 transition-all rounded-lg duration-300 py-3 ${
@@ -80,6 +94,21 @@ const Sidebar = ({ isOpen, toggle }: SidebarProps) => {
             isOpen={isOpen}
           />
         </nav>
+        <div className="-mx-3">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center rounded-lg px-3 py-2 text-gray-600 transition-colors duration-300 hover:bg-gray-200 hover:text-gray-700"
+          >
+            <LogOut className="h-5 w-5" aria-hidden="true" />
+            <span
+              className={`mx-2 text-sm font-medium transition-opacity duration-200 ${
+                isOpen ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              Logout
+            </span>
+          </button>
+        </div>
       </div>
     </aside>
   );

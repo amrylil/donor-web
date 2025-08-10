@@ -3,53 +3,50 @@ import { Plus, MoreHorizontal } from "lucide-react";
 import type { ColumnDef } from "../components/ui/GenericTable";
 import GenericTable from "../components/ui/GenericTable";
 import Modal from "../components/ui/Modal";
-import { useQuery } from "@tanstack/react-query";
 import TableSkeleton from "../components/ui/TableSkeleton";
 import { useUsers } from "../hooks/useUsers";
 import type { UserResponse } from "../types/userTypes";
 import UserForm from "../components/users/UserForm";
+import { useAuth } from "../hooks/useAuth";
 
 const UsersPage = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const { users, error, fetchUsers, loading } = useUsers();
+  const { registerAdmin } = useAuth();
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
 
   useEffect(() => {
     fetchUsers();
-    console.log("Users data:", users);
-  }, []);
+  }, [fetchUsers]);
 
-  const handleOpenModal = (donation: UserResponse | null) => {
-    setSelectedUser(donation);
+  const handleOpenModal = (user: UserResponse | null) => {
+    setSelectedUser(user);
     setModalOpen(true);
   };
 
-  if (error) {
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  // Wrapper untuk handle submit dari form
+  const handleRegisterSubmit = async (
+    name: string,
+    email: string,
+    password: string
+  ) => {
+    await registerAdmin(email, password, name);
+    fetchUsers();
+  };
+
+  if (error && !users) {
     return <div>Error fetching data. Please try again later.</div>;
   }
 
-  // Definisikan kolom untuk GenericTable
   const columns: ColumnDef<UserResponse>[] = [
-    {
-      header: "Name",
-      accessorKey: "name",
-      // cell: (row) => (
-      //   <div className="flex items-center gap-3">
-      //     <img
-      //       src={row.donor.avatar}
-      //       alt={row.donor.name}
-      //       className="h-9 w-9 rounded-full object-cover"
-      //     />
-      //     <div>
-      //       <p className="font-medium text-gray-900">{row.donor.name}</p>
-      //       <p className="text-gray-500">{row.id}</p>
-      //     </div>
-      //   </div>
-      // ),
-    },
+    { header: "Name", accessorKey: "name" },
     { header: "Email", accessorKey: "email" },
     { header: "Role", accessorKey: "role" },
-
     {
       header: "Actions",
       accessorKey: "id",
@@ -65,24 +62,25 @@ const UsersPage = () => {
   ];
 
   return (
-    <div>
+    <div className="p-6 md:p-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Donations</h1>
+          {/* Memperbaiki teks judul */}
+          <h1 className="text-3xl font-bold text-gray-800">Users Management</h1>
           <p className="mt-1 text-gray-500">
-            Kelola semua data donasi yang masuk.
+            Kelola semua data pengguna dan admin.
           </p>
         </div>
         <button
           onClick={() => handleOpenModal(null)}
           className="flex items-center gap-2 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700"
         >
-          <Plus size={16} /> Add Donation
+          <Plus size={16} /> Add User
         </button>
       </div>
 
       <div className="mt-6">
-        {loading ? (
+        {loading && !users?.length ? ( // Tampilkan skeleton hanya saat loading awal
           <TableSkeleton />
         ) : (
           <GenericTable columns={columns} data={users || []} />
@@ -91,10 +89,15 @@ const UsersPage = () => {
 
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        title={selectedUser ? "Edit Donation" : "Add New Donation"}
+        onClose={handleCloseModal}
+        title={selectedUser ? "Edit User" : "Add New User"}
       >
-        <UserForm onClose={() => setModalOpen(false)} />
+        {/* Teruskan fungsi onRegister dan data awal ke form */}
+        <UserForm
+          onClose={handleCloseModal}
+          onRegister={handleRegisterSubmit}
+          initialData={selectedUser}
+        />
       </Modal>
     </div>
   );

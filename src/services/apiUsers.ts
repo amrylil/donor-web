@@ -21,7 +21,6 @@ export const getAll = async (token: string): Promise<UserResponse[]> => {
       throw new Error(data.message || "Gagal mengambil data pengguna.");
     }
 
-    console.log("Pengguna berhasil diambil:", data.data.data);
     return data.data.data as UserResponse[];
   } catch (error: any) {
     console.error("Gagal mengambil data pengguna:", error.message);

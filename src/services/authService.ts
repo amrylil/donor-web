@@ -88,7 +88,8 @@ export const loginWithGoogle = (): Promise<AuthResponse> => {
 export const registerAdmin = async (
   email: string,
   password: string,
-  name: string
+  name: string,
+  token: string
 ): Promise<UserResponse> => {
   const URL = `${API_BASE_URL}/auth/register/admin`;
 
@@ -97,6 +98,7 @@ export const registerAdmin = async (
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ email, password, name }),
     });

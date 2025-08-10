@@ -18,12 +18,12 @@ export const useAuth = () => {
   const [user, setUser] = useState<AuthResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const token = user?.token || localStorage.getItem("authToken");
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
-    console.log("Memeriksa token di localStorage:", token);
     if (token) {
       console.log("Token ditemukan di localStorage, set state pengguna.");
       setUser({ token });
@@ -50,10 +50,9 @@ export const useAuth = () => {
     password: string,
     name: string
   ): Promise<void> => {
-    setLoading(true);
     setError(null);
     try {
-      await apiRegisterAdmin(email, password, name);
+      await apiRegisterAdmin(email, password, name, user?.token || "");
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan saat registrasi admin.");
     } finally {
@@ -113,5 +112,6 @@ export const useAuth = () => {
     getProfile,
     apiRegisterAdmin,
     registerAdmin,
+    token,
   };
 };

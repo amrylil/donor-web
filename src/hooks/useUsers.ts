@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { UserResponse } from "../types/userTypes";
 import { getAll } from "../services/apiUsers";
 import { getToken } from "../utils/getToken";
@@ -8,13 +8,15 @@ export const useUsers = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUsers = async (): Promise<void> => {
+  const fetchUsers = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
     const token = getToken();
     if (!token) {
-      throw new Error("Token tidak ditemukan. Harap login kembali.");
+      setError("Token tidak ditemukan. Harap login kembali.");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -27,7 +29,7 @@ export const useUsers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     users,

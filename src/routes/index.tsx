@@ -2,9 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../components/Layouts/MainLayout";
 import DashboardPage from "../pages/DashboardPage";
 import DonationsPage from "../pages/DonationsPage";
-import LocationsPage from "../pages/LocationsPage";
 import LoginPage from "../pages/LoginPage";
 import UsersPage from "../pages/UserPages";
+import RoleBasedLocationsPage from "../pages/RoleBasedLocationsPage";
 
 export const router = createBrowserRouter([
   {
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "locations",
-        element: <LocationsPage />,
+        element: <RoleBasedLocationsPage />,
       },
       {
         path: "users",

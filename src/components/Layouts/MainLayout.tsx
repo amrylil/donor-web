@@ -12,7 +12,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     if (isAuthReady && !user) {
-      navigate("/login");
+      navigate("/auth/login");
     }
 
     if (user && !profile) {
